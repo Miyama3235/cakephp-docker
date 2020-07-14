@@ -1,16 +1,28 @@
-# どのイメージを基にするか
-FROM nginx
-# 作成したユーザの情報
+FROM ubuntu
 LABEL maintainer="Masato <masato.m.1995.0116@gmail.com>"
-# RUN: docker buildするときに実行される
-RUN apt-get update -y
-RUN apt-get  install -y vim unzip curl php-cli php-mbstring git 
-RUN php -r "copy（ 'https://getcomposer.org/installer'、 'composer-setup.php'）;"
-RUN php -r "if（hash_file（ 'sha384'、 'composer-setup.php'）=== 'e0012edf3e80b6978849f5eff0d4b4e4c79ff1609dd1e613307e16318854d24ae64f26d17af3ef0bf7cfb710ca74755a'）{echo 'Install' echo'Install 'error'Installer'確認された 'エコー'インストーラー '確認された'エコー 'インストーラー'; php '）;} echo PHP_EOL; "
-RUN php composer-setup.php
-RUN php -r "unlink（ 'composer-setup.php'）;"
+WORKDIR /var/www/html
 
-ENTRYPOINT ["myapps"]
+ENV DEBIAN_FRONTEND=noninteractive
+
+# RUN: docker buildするときに実行される
+RUN apt-get  update
+RUN apt-get -y install php php-cgi libapache2-mod-php php-common php-intl php-pear php-mbstring php-mysql php-sqlite3 sqlite3
+RUN apt-get -y install apt-utils
+RUN apt-get -y install composer
+RUN echo  "ServerName localhost" | tee /etc/apache2/conf-available/my_server.conf
+RUN a2enconf my_server
+RUN a2enmod rewrite
+
+COPY ./jackdoe-web.conf /etc/apache2/sites-available
+COPY ./apache2.conf /etc/apache2
+
+RUN a2dissite 000-default.conf
+RUN a2ensite jackdoe-web.conf
+
+RUN composer create-project --prefer-dist cakephp/app jackdoe-web
+# service apache2 start 
 
 # CMD: docker runするときに実行される
-CMD echo "now running..."
+CMD ["apachectl", "-D", "FOREGROUND"]
+
+
