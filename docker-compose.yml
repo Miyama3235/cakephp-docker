@@ -1,0 +1,33 @@
+version: '2'
+services:
+  cakephp:
+    build: ./cakephp/    #Dockerfileからビルドすることを示す
+    image: doc_cakephp
+    container_name: doc_cakephp
+    ports:
+      - "8888:80"
+    depends_on:
+      - mysql
+    # Connect a container to another container
+    links:
+      - mysql
+    restart: always
+  mysql:
+    build: ./mysql/    #Dockerfileからビルドすることを示す
+    image: doc_mysql
+    container_name: doc_mysql
+    ports:
+      - 3306:3306
+    # Environment
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: main
+      MYSQL_USER: cakephp
+      MYSQL_PASSWORD: masato1995
+      TZ: 'Asia/Tokyo'
+    # Mount host directory(host:container)
+    volumes:
+      - ./mysql/db:/docker-entrypoint-initdb.d  #初期データ
+      - ./mysql/db/mysql_data:/var/lib/mysql  #永続化
+          # Restart
+    restart: always
