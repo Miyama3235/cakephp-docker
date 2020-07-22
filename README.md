@@ -1,8 +1,6 @@
 # cakephp-docker
-Ubuntu Cakephp4.0 on Docker
+Ubuntu Cakephp4.0 on Docker & MySQL
 
-ビルド
-> docker build -t doc_cake .
+起動（バックグラウンド）
+> docker-compose up -d
 
-起動
-> docker run -dti -p 8888:80 --name doc_cakephp doc_cake
